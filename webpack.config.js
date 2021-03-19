@@ -5,7 +5,8 @@ const EslintWebpackPlugin = require('eslint-webpack-plugin');
 
 const path = require('path');
 
-const filename = ext => process.env.NODE_ENV === 'development' ? `[name].${ext}` : `[name].[contenthash].${ext}`;
+// const filename = ext => process.env.NODE_ENV === 'development' ? `[name].${ext}` : `[name].[contenthash].${ext}`;
+const filename = ext => `[name].${ext}`;
 
 module.exports = {
   context: path.resolve(__dirname, 'src'),
