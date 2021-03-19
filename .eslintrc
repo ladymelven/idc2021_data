@@ -1,0 +1,45 @@
+{
+  "extends": ["airbnb-base", "airbnb-typescript/base"],
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "func-names": "off",
+    "no-process-exit": "off",
+    "class-methods-use-this": "off",
+    "comma-dangle": ["error", "never"],
+    "global-require": "off",
+    "import/no-unresolved": "off",
+    "no-class-assign": "off",
+    "import/no-named-as-default": "off",
+    "dot-notation": "off",
+    "prefer-template": "off",
+    "no-plusplus": "off",
+    "prefer-rest-params": "off",
+    "no-param-reassign": "off",
+    "no-multi-assign": "off",
+    "prefer-spread": "off",
+    "no-unused-expressions": "off",
+    "no-restricted-syntax": "off",
+    "prefer-const": "warn",
+    "no-lonely-if": "off",
+    "eqeqeq": "warn",
+    "prefer-destructuring": "off",
+    "lines-between-class-members": "off",
+    "spaced-comment": "off",
+    "import/newline-after-import": "off",
+    "max-classes-per-file": "off",
+    "no-new": "off",
+    "import/first": "off",
+    "consistent-return": "off",
+    "no-useless-escape": "off",
+    "linebreak-style": "off"
+  },
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "project": "./tsconfig.json",
+    "fix": false,
+    "exclude": [
+      "node_modules"
+    ]
+  }
+}
