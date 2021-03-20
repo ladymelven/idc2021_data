@@ -1,7 +1,4 @@
 /******/ "use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.filterCommitsBySprint = exports.filterByUser = exports.setWordEnding = exports.filterData = exports.sortData = void 0;
 function memoize(func) {
     const cache = new Map();
     return (...args) => {
@@ -45,7 +42,6 @@ function sortData(entities) {
     });
     return { users, comments, commits, summaries, sprints };
 }
-exports.sortData = sortData;
 function filterData(data, id) {
     //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
     const sprint = data.sprints.filter((sprint) => sprint.id === id)[0];
@@ -57,7 +53,6 @@ function filterData(data, id) {
     const filteredCommits = exports.filterCommitsBySprint(data.commits, sprint);
     return { comments: filteredComments, commits: filteredCommits, sprint };
 }
-exports.filterData = filterData;
 function baseFilterCommitsBySprint(commits, sprint) {
     return commits.filter((commit) => {
         return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
@@ -72,7 +67,6 @@ function setWordEnding(num, variants) {
     }
     return variants[2];
 }
-exports.setWordEnding = setWordEnding;
 function baseGetAuthorId(unit) {
     if (typeof unit.author === 'number') {
         return unit.author;
@@ -86,8 +80,8 @@ function baseFilterByUser(data, id) {
     return data.filter((unit) => getAuthorId(unit) === id);
 }
 const getAuthorId = memoize(baseGetAuthorId);
-exports.filterByUser = memoize(baseFilterByUser);
-exports.filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
+const filterByUser = memoize(baseFilterByUser);
+const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
 
 function rankUsers(users, commits, comments, identifier, stopper) {
     let text = '';
