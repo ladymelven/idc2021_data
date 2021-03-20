@@ -1,4 +1,4 @@
-import { Comment, Commit, Entity, Sprint, Summary, User } from './types';
+import { Comment, Commit, Entity, Sprint, Summary, User } from '../types/types';
 
 export function sortData(entities: Entity[]) {
   //мы работаем только с этими сущностями, issues и projects нам не нужны

@@ -1,7 +1,7 @@
 import {
   Comment, Commit, Entity, Sprint, Summary, User,
-} from './types';
-import * as stories from './stories';
+} from '../types/types';
+import * as stories from '../types/stories';
 import {
   sortData,
   filterByUser,

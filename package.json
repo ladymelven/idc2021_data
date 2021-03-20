@@ -6,6 +6,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --mode production",
     "start": "cross-env NODE_ENV=development webpack serve --mode development",
+    "dev": "cross-env NODE_ENV=development webpack --mode development",
     "test": "jest"
   },
   "author": "ladymelven",

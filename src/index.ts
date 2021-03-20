@@ -1,4 +1,4 @@
-const prepareData = require('./prepare').default;
+const prepareData = require('./app/prepare').default;
 
 // const data = require('./data/input.json');
 // console.time('func');
