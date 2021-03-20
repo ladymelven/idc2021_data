@@ -1,4 +1,5 @@
 /******/ "use strict";
+
 function memoize(func) {
     const cache = new Map();
     return (...args) => {
@@ -12,6 +13,7 @@ function memoize(func) {
         }
     };
 }
+
 function sortData(entities) {
     //мы работаем только с этими сущностями, issues и projects нам не нужны
     //будут нужны, их легко сюда добавить
@@ -42,6 +44,7 @@ function sortData(entities) {
     });
     return { users, comments, commits, summaries, sprints };
 }
+
 function filterData(data, id) {
     //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
     const sprint = data.sprints.filter((sprint) => sprint.id === id)[0];
@@ -58,6 +61,7 @@ function baseFilterCommitsBySprint(commits, sprint) {
         return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
     });
 }
+
 function setWordEnding(num, variants) {
     if (num === 1) {
         return variants[0];
@@ -67,6 +71,7 @@ function setWordEnding(num, variants) {
     }
     return variants[2];
 }
+
 function baseGetAuthorId(unit) {
     if (typeof unit.author === 'number') {
         return unit.author;
@@ -75,10 +80,12 @@ function baseGetAuthorId(unit) {
         return unit.author.id;
     }
 }
+
 function baseFilterByUser(data, id) {
     // @ts-ignore
     return data.filter((unit) => getAuthorId(unit) === id);
 }
+
 const getAuthorId = memoize(baseGetAuthorId);
 const filterByUser = memoize(baseFilterByUser);
 const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
@@ -139,6 +146,7 @@ function rankUsers(users, commits, comments, identifier, stopper) {
         };
     });
 }
+
 function prepareChart(commits, sprints, activeId) {
     const sortedSprints = sprints.sort((sprint1, sprint2) => {
         return sprint1.id - sprint2.id;
@@ -155,6 +163,7 @@ function prepareChart(commits, sprints, activeId) {
         return sprintInfo;
     });
 }
+
 function getBreakdown(commits, summaries, limits) {
     const values = [0];
     // у нас 4 категории, но ничто не мешает разбить на любое другое количество
@@ -187,6 +196,7 @@ function getBreakdown(commits, summaries, limits) {
     });
     return values;
 }
+
 function prepareDiagram(currentCommits, prevCommits, summaries) {
     const currentValue = currentCommits.length;
     const differenceSign = currentValue > prevCommits.length ? '+' : '-';
@@ -235,6 +245,7 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
         categories
     };
 }
+
 function prepareActivity(commits) {
     const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const heatmap = {
@@ -247,18 +258,18 @@ function prepareActivity(commits) {
         sat: []
     };
     for (let key in heatmap) {
-        for (let i = 0; i < 24; i++) { // @ts-ignore
+        for (let i = 0; i < 24; i++) {
             heatmap[key].push(0);
         }
     }
     commits.forEach(commit => {
         const datetime = new Date(commit.timestamp);
         const dayName = dayNames[datetime.getDay()];
-        // @ts-ignore
         heatmap[dayName][datetime.getHours()]++;
     });
     return heatmap;
 }
+
 function prepareData(entities, identifier) {
     //сначала раскидываем дату по типам, чтобы не проходиться каждый раз по всему массиву
     const sorted = sortData(entities);
