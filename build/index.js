@@ -80,14 +80,14 @@ function rankUsers(users, commits, comments, identifier, stopper) {
         case 'commits':
             map = users.map((user) => ({
                 id: user.id,
-                frequency: helpers_1.filterByUser(commits, user.id).length,
+                frequency: filterByUser(commits, user.id).length,
             }));
             text = '';
             endings = ['', '', ''];
             break;
         case 'likes':
             map = users.map((user) => {
-                const userComments = helpers_1.filterByUser(comments, user.id);
+                const userComments = filterByUser(comments, user.id);
                 const likes = userComments.map((comment) => {
                     return comment.likes.length;
                 });
@@ -112,7 +112,7 @@ function rankUsers(users, commits, comments, identifier, stopper) {
     }
     return slice.map((unit) => {
         const { name, avatar } = users.filter((user) => unit.id === user.id)[0];
-        const userText = unit.frequency + text + helpers_1.setWordEnding(unit.frequency, endings);
+        const userText = unit.frequency + text + setWordEnding(unit.frequency, endings);
         return {
             id: unit.id,
             name,
@@ -129,7 +129,7 @@ function prepareChart(commits, sprints, activeId) {
         const sprintInfo = {
             title: sprint.id.toString(10),
             hint: sprint.name,
-            value: helpers_1.filterCommitsBySprint(commits, sprint).length
+            value: filterCommitsBySprint(commits, sprint).length
         };
         if (sprint.id === activeId) {
             sprintInfo.active = true;
@@ -199,20 +199,20 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
             diffText = '==';
         }
         if (higher) {
-            title = `${lower} — ${higher} строк${helpers_1.setWordEnding(higher, ['а', 'и', ''])}`;
+            title = `${lower} — ${higher} строк${setWordEnding(higher, ['а', 'и', ''])}`;
         }
         else {
-            title = `> ${lower} строк${helpers_1.setWordEnding(lower, ['а', 'и', ''])}`;
+            title = `> ${lower} строк${setWordEnding(lower, ['а', 'и', ''])}`;
         }
         //потенциально дорогая операция, но у нас же никогда не будет много категорий?
         categories.unshift({
             title,
-            valueText: `${value} коммит${helpers_1.setWordEnding(value, ['', 'а', 'ов'])}`,
+            valueText: `${value} коммит${setWordEnding(value, ['', 'а', 'ов'])}`,
             differenceText: diffText
         });
     }
     return {
-        totalText: `${currentValue} коммит${helpers_1.setWordEnding(currentValue, ['', 'а', 'ов'])}`,
+        totalText: `${currentValue} коммит${setWordEnding(currentValue, ['', 'а', 'ов'])}`,
         differenceText,
         categories
     };
@@ -243,9 +243,9 @@ function prepareActivity(commits) {
 }
 function prepareData(entities, identifier) {
     //сначала раскидываем дату по типам, чтобы не проходиться каждый раз по всему массиву
-    const sorted = helpers_1.sortData(entities);
+    const sorted = sortData(entities);
     //потом сортируем то, что относится к текущему спринту (заодно получаем текущий спринт)
-    const filtered = helpers_1.filterData(sorted, identifier.sprintId);
+    const filtered = filterData(sorted, identifier.sprintId);
     const prevSprint = sorted.sprints.filter(sprint => sprint.id === identifier.sprintId - 1)[0];
     return [
         {
@@ -277,7 +277,7 @@ function prepareData(entities, identifier) {
         },
         {
             alias: 'diagram',
-            data: Object.assign({ title: 'Размер коммитов', subtitle: filtered.sprint.name }, prepareDiagram(filtered.commits, helpers_1.filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries))
+            data: Object.assign({ title: 'Размер коммитов', subtitle: filtered.sprint.name }, prepareDiagram(filtered.commits, filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries))
         },
         {
             alias: 'activity',
