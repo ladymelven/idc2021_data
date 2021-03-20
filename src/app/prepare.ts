@@ -10,7 +10,6 @@ import {
   setWordEnding
 } from './helpers';
 
-
 function rankUsers(users: User[],
                    commits: Commit[],
                    comments: Comment[],
@@ -22,10 +21,12 @@ function rankUsers(users: User[],
 
   switch (identifier) {
     case 'commits':
-      map = users.map((user) => ({
-        id: user.id,
-        frequency: filterByUser(commits, user.id).length,
-      }));
+      map = users.map((user) => {
+        return {
+          id: user.id,
+          frequency: filterByUser(commits, user.id).length,
+        };
+      });
       text = '';
       endings = ['', '', ''];
       break;
@@ -46,7 +47,11 @@ function rankUsers(users: User[],
   }
 
   const ranked = map.sort((unit1, unit2) => {
-    return unit2.frequency - unit1.frequency;
+    if (unit1.frequency !== unit2.frequency) {
+      return unit2.frequency - unit1.frequency;
+    } else {
+      return unit1.id - unit2.id;
+    }
   });
   let slice;
 
@@ -208,8 +213,18 @@ export default function prepareData(entities: Entity[], identifier: { sprintId: 
   //потом сортируем то, что относится к текущему спринту (заодно получаем текущий спринт)
   const filtered = filterData(sorted, identifier.sprintId);
   const prevSprint = sorted.sprints.filter(sprint => sprint.id === identifier.sprintId - 1)[0];
+  const currentRank = rankUsers(sorted.users, filtered.commits, filtered.comments, 'commits');
 
   return [
+    {
+      alias: 'leaders',
+      data: {
+        title: 'Больше всего коммитов',
+        subtitle: filtered.sprint.name,
+        emoji: '👑',
+        users: currentRank
+      }
+    },
     {
       alias: 'vote',
       data: {
@@ -220,21 +235,12 @@ export default function prepareData(entities: Entity[], identifier: { sprintId: 
       }
     },
     {
-      alias: 'leaders',
-      data: {
-        title: 'Больше всего коммитов',
-        subtitle: filtered.sprint.name,
-        emoji: '👑',
-        users: rankUsers(sorted.users, filtered.commits, filtered.comments, 'commits')
-      }
-    },
-    {
       alias: 'chart',
       data: {
         title: 'Коммиты',
         subtitle: filtered.sprint.name,
         values: prepareChart(sorted.commits, sorted.sprints, filtered.sprint.id),
-        users: rankUsers(sorted.users, filtered.commits, filtered.comments, 'commits', 3)
+        users: currentRank
       }
     },
     {
@@ -244,7 +250,8 @@ export default function prepareData(entities: Entity[], identifier: { sprintId: 
         subtitle: filtered.sprint.name,
         ...prepareDiagram(
           filtered.commits,
-          filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries
+          filterCommitsBySprint(sorted.commits, prevSprint),
+          sorted.summaries
         )
       }
     },

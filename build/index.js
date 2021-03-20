@@ -1,4 +1,20 @@
 /******/ "use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.filterCommitsBySprint = exports.filterByUser = exports.setWordEnding = exports.filterData = exports.sortData = void 0;
+function memoize(func) {
+    const cache = new Map();
+    return (...args) => {
+        if (cache.has(args)) {
+            return cache.get(args);
+        }
+        else {
+            const result = func(...args);
+            cache.set(args, result);
+            return result;
+        }
+    };
+}
 function sortData(entities) {
     //мы работаем только с этими сущностями, issues и projects нам не нужны
     //будут нужны, их легко сюда добавить
@@ -29,13 +45,7 @@ function sortData(entities) {
     });
     return { users, comments, commits, summaries, sprints };
 }
-
-function filterCommitsBySprint(commits, sprint) {
-    return commits.filter((commit) => {
-        return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
-    });
-}
-
+exports.sortData = sortData;
 function filterData(data, id) {
     //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
     const sprint = data.sprints.filter((sprint) => sprint.id === id)[0];
@@ -44,10 +54,15 @@ function filterData(data, id) {
         return Math.floor(comment.createdAt) >= sprint.startAt &&
             Math.floor(comment.createdAt) <= sprint.finishAt;
     });
-    const filteredCommits = filterCommitsBySprint(data.commits, sprint);
+    const filteredCommits = exports.filterCommitsBySprint(data.commits, sprint);
     return { comments: filteredComments, commits: filteredCommits, sprint };
 }
-
+exports.filterData = filterData;
+function baseFilterCommitsBySprint(commits, sprint) {
+    return commits.filter((commit) => {
+        return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
+    });
+}
 function setWordEnding(num, variants) {
     if (num === 1) {
         return variants[0];
@@ -57,8 +72,8 @@ function setWordEnding(num, variants) {
     }
     return variants[2];
 }
-
-function getAuthorId(unit) {
+exports.setWordEnding = setWordEnding;
+function baseGetAuthorId(unit) {
     if (typeof unit.author === 'number') {
         return unit.author;
     }
@@ -66,11 +81,13 @@ function getAuthorId(unit) {
         return unit.author.id;
     }
 }
-
-function filterByUser(data, id) {
+function baseFilterByUser(data, id) {
     // @ts-ignore
     return data.filter((unit) => getAuthorId(unit) === id);
 }
+const getAuthorId = memoize(baseGetAuthorId);
+exports.filterByUser = memoize(baseFilterByUser);
+exports.filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
 
 function rankUsers(users, commits, comments, identifier, stopper) {
     let text = '';
@@ -78,10 +95,12 @@ function rankUsers(users, commits, comments, identifier, stopper) {
     let map = [];
     switch (identifier) {
         case 'commits':
-            map = users.map((user) => ({
-                id: user.id,
-                frequency: filterByUser(commits, user.id).length,
-            }));
+            map = users.map((user) => {
+                return {
+                    id: user.id,
+                    frequency: filterByUser(commits, user.id).length,
+                };
+            });
             text = '';
             endings = ['', '', ''];
             break;
@@ -101,7 +120,12 @@ function rankUsers(users, commits, comments, identifier, stopper) {
         //no-default
     }
     const ranked = map.sort((unit1, unit2) => {
-        return unit2.frequency - unit1.frequency;
+        if (unit1.frequency !== unit2.frequency) {
+            return unit2.frequency - unit1.frequency;
+        }
+        else {
+            return unit1.id - unit2.id;
+        }
     });
     let slice;
     if (stopper) {
@@ -247,7 +271,17 @@ function prepareData(entities, identifier) {
     //потом сортируем то, что относится к текущему спринту (заодно получаем текущий спринт)
     const filtered = filterData(sorted, identifier.sprintId);
     const prevSprint = sorted.sprints.filter(sprint => sprint.id === identifier.sprintId - 1)[0];
+    const currentRank = rankUsers(sorted.users, filtered.commits, filtered.comments, 'commits');
     return [
+        {
+            alias: 'leaders',
+            data: {
+                title: 'Больше всего коммитов',
+                subtitle: filtered.sprint.name,
+                emoji: '👑',
+                users: currentRank
+            }
+        },
         {
             alias: 'vote',
             data: {
@@ -258,21 +292,12 @@ function prepareData(entities, identifier) {
             }
         },
         {
-            alias: 'leaders',
-            data: {
-                title: 'Больше всего коммитов',
-                subtitle: filtered.sprint.name,
-                emoji: '👑',
-                users: rankUsers(sorted.users, filtered.commits, filtered.comments, 'commits')
-            }
-        },
-        {
             alias: 'chart',
             data: {
                 title: 'Коммиты',
                 subtitle: filtered.sprint.name,
                 values: prepareChart(sorted.commits, sorted.sprints, filtered.sprint.id),
-                users: rankUsers(sorted.users, filtered.commits, filtered.comments, 'commits', 3)
+                users: currentRank
             }
         },
         {

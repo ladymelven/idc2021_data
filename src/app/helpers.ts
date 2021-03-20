@@ -1,5 +1,19 @@
 import { Comment, Commit, Entity, Sprint, Summary, User } from '../types/types';
 
+function memoize(func: any) {
+  const cache = new Map();
+
+  return (...args: any) => {
+    if (cache.has(args)) {
+      return cache.get(args);
+    } else {
+      const result = func(...args);
+      cache.set(args, result);
+      return result;
+    }
+  }
+}
+
 export function sortData(entities: Entity[]) {
   //мы работаем только с этими сущностями, issues и projects нам не нужны
   //будут нужны, их легко сюда добавить
@@ -33,12 +47,6 @@ export function sortData(entities: Entity[]) {
   return { users, comments, commits, summaries, sprints };
 }
 
-export function filterCommitsBySprint(commits: Commit[], sprint: Sprint) {
-  return commits.filter((commit) => {
-    return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
-  });
-}
-
 export function filterData(
   data: {
     users: User[],
@@ -62,6 +70,12 @@ export function filterData(
   return { comments: filteredComments, commits: filteredCommits, sprint };
 }
 
+function baseFilterCommitsBySprint(commits: Commit[], sprint: Sprint) {
+  return commits.filter((commit) => {
+    return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
+  });
+}
+
 export function setWordEnding(num: number, variants: Array<string>) {
   if (num === 1) {
     return variants[0];
@@ -71,7 +85,7 @@ export function setWordEnding(num: number, variants: Array<string>) {
   return variants[2];
 }
 
-export function getAuthorId(unit: Comment | Commit) {
+function baseGetAuthorId(unit: Comment | Commit) {
   if (typeof unit.author === 'number') {
     return unit.author;
   } if (unit.author.hasOwnProperty('id')) {
@@ -79,7 +93,11 @@ export function getAuthorId(unit: Comment | Commit) {
   }
 }
 
-export function filterByUser(data: Commit[] | Comment[], id: number) {
+function baseFilterByUser(data: Commit[] | Comment[], id: number) {
   // @ts-ignore
   return data.filter((unit: Commit | Comment) => getAuthorId(unit) === id);
 }
+
+const getAuthorId = memoize(baseGetAuthorId);
+export const filterByUser = memoize(baseFilterByUser);
+export const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
