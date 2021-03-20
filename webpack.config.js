@@ -33,6 +33,9 @@ module.exports = {
     port: 8080,
     hot: process.env.NODE_ENV === 'development'
   },
+  optimization: {
+    minimize: false,
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'index.html'
