@@ -1,12 +1,4 @@
 /******/ "use strict";
-/******/ var __webpack_modules__ = ({
-
-/***/ 766:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.filterByUser = exports.getAuthorId = exports.setWordEnding = exports.filterData = exports.filterCommitsBySprint = exports.sortData = void 0;
 function sortData(entities) {
     //мы работаем только с этими сущностями, issues и projects нам не нужны
     //будут нужны, их легко сюда добавить
@@ -37,13 +29,13 @@ function sortData(entities) {
     });
     return { users, comments, commits, summaries, sprints };
 }
-exports.sortData = sortData;
+
 function filterCommitsBySprint(commits, sprint) {
     return commits.filter((commit) => {
         return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
     });
 }
-exports.filterCommitsBySprint = filterCommitsBySprint;
+
 function filterData(data, id) {
     //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
     const sprint = data.sprints.filter((sprint) => sprint.id === id)[0];
@@ -55,7 +47,7 @@ function filterData(data, id) {
     const filteredCommits = filterCommitsBySprint(data.commits, sprint);
     return { comments: filteredComments, commits: filteredCommits, sprint };
 }
-exports.filterData = filterData;
+
 function setWordEnding(num, variants) {
     if (num === 1) {
         return variants[0];
@@ -65,7 +57,7 @@ function setWordEnding(num, variants) {
     }
     return variants[2];
 }
-exports.setWordEnding = setWordEnding;
+
 function getAuthorId(unit) {
     if (typeof unit.author === 'number') {
         return unit.author;
@@ -74,23 +66,12 @@ function getAuthorId(unit) {
         return unit.author.id;
     }
 }
-exports.getAuthorId = getAuthorId;
+
 function filterByUser(data, id) {
     // @ts-ignore
     return data.filter((unit) => getAuthorId(unit) === id);
 }
-exports.filterByUser = filterByUser;
 
-
-/***/ }),
-
-/***/ 936:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-var __webpack_unused_export__;
-
-__webpack_unused_export__ = ({ value: true });
-const helpers_1 = __webpack_require__(766);
 function rankUsers(users, commits, comments, identifier, stopper) {
     let text = '';
     let endings = ['', 'а', 'ов'];
@@ -308,55 +289,5 @@ function prepareData(entities, identifier) {
         }
     ];
 }
-exports.Z = prepareData;
 
-
-/***/ }),
-
-/***/ 303:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-
-const prepareData = __webpack_require__(936)/* .default */ .Z;
-// const data = require('./data/input.json');
-// console.time('func');
-// console.log(prepareData(data, { sprintId: 977 }));
-// console.timeEnd('func');
 module.exports = { prepareData };
-
-
-/***/ })
-
-/******/ });
-/************************************************************************/
-/******/ // The module cache
-/******/ var __webpack_module_cache__ = {};
-/******/ 
-/******/ // The require function
-/******/ function __webpack_require__(moduleId) {
-/******/ 	// Check if module is in cache
-/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 	if (cachedModule !== undefined) {
-/******/ 		return cachedModule.exports;
-/******/ 	}
-/******/ 	// Create a new module (and put it into the cache)
-/******/ 	var module = __webpack_module_cache__[moduleId] = {
-/******/ 		// no module.id needed
-/******/ 		// no module.loaded needed
-/******/ 		exports: {}
-/******/ 	};
-/******/ 
-/******/ 	// Execute the module function
-/******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 
-/******/ 	// Return the exports of the module
-/******/ 	return module.exports;
-/******/ }
-/******/ 
-/************************************************************************/
-/******/ 
-/******/ // startup
-/******/ // Load entry module and return exports
-/******/ // This entry module is referenced by other modules so it can't be inlined
-/******/ var __webpack_exports__ = __webpack_require__(303);
-/******/ 
