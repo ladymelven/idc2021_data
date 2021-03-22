@@ -49,10 +49,10 @@ module.exports = {
         }
       ]
     }),
-    // new EslintWebpackPlugin({
-    //   extensions: ['.ts', '.js', '.json'],
-    //   fix: true,
-    //   exclude: 'node_modules'
-    // })
+    new EslintWebpackPlugin({
+      extensions: ['.ts'],
+      fix: false,
+      exclude: 'node_modules'
+    })
   ]
 }

@@ -1,5 +1,5 @@
 import {
-  Comment, Commit, Entity, Sprint, Summary, User,
+  Comment, Commit, Entity, Sprint, Summary, User
 } from '../types/types';
 import * as stories from '../types/stories';
 import {
@@ -11,10 +11,10 @@ import {
 } from './helpers';
 
 function rankUsers(users: User[],
-                   commits: Commit[],
-                   comments: Comment[],
-                   identifier: 'commits' | 'likes',
-                   stopper?: number) {
+  commits: Commit[],
+  comments: Comment[],
+  identifier: 'commits' | 'likes',
+  stopper?: number) {
   let text = '';
   let endings = ['', 'а', 'ов'];
   let map: { id: number, frequency: number }[] = [];
@@ -24,7 +24,7 @@ function rankUsers(users: User[],
       map = users.map((user) => {
         return {
           id: user.id,
-          frequency: filterByUser(commits, user.id).length,
+          frequency: filterByUser(commits, user.id).length
         };
       });
       text = '';
@@ -47,11 +47,10 @@ function rankUsers(users: User[],
   }
 
   const ranked = map.sort((unit1, unit2) => {
-    if (unit1.frequency !== unit2.frequency) {
-      return unit2.frequency - unit1.frequency;
-    } else {
+    if (unit1.frequency === unit2.frequency) {
       return unit1.id - unit2.id;
     }
+    return unit2.frequency - unit1.frequency;
   });
   let slice;
 
@@ -83,9 +82,9 @@ function prepareChart(commits: Commit[], sprints: Sprint[], activeId: number) {
       title: sprint.id.toString(10),
       hint: sprint.name,
       value: filterCommitsBySprint(commits, sprint).length
-    }
+    };
 
-    if (sprint.id === activeId) { sprintInfo.active = true }
+    if (sprint.id === activeId) { sprintInfo.active = true; }
 
     return sprintInfo;
   });
@@ -112,7 +111,8 @@ function getBreakdown(commits: Commit[], summaries: Summary[], limits: Array<num
       }
     });
 
-    // проверяем, под какой из лимитов попадает размер коммита; если больше самого большого, записываем в конец
+    // проверяем, под какой из лимитов попадает размер;
+    // если больше самого большого, записываем в конец
     for (let i = 0; i <= limits.length; i++) {
       if (limits[i] && size <= limits[i]) {
         values[i]++;
@@ -192,8 +192,11 @@ function prepareActivity(commits: Commit[]) {
   };
 
   for (let key in heatmap) {
-    for (let i = 0; i < 24; i++) { // @ts-ignore
-      heatmap[key].push(0) }
+    if ({}.hasOwnProperty.call(heatmap, key)) {
+      for (let i = 0; i < 24; i++) { // @ts-ignore
+        heatmap[key].push(0);
+      }
+    }
   }
 
   commits.forEach(commit => {
@@ -206,8 +209,10 @@ function prepareActivity(commits: Commit[]) {
   return heatmap;
 }
 
-
-export default function prepareData(entities: Entity[], identifier: { sprintId: number }): stories.StoryData {
+export default function prepareData(
+  entities: Entity[],
+  identifier: { sprintId: number }
+): stories.StoryData {
   //сначала раскидываем дату по типам, чтобы не проходиться каждый раз по всему массиву
   const sorted = sortData(entities);
   //потом сортируем то, что относится к текущему спринту (заодно получаем текущий спринт)

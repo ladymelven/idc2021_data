@@ -4,6 +4,7 @@
     "no-unused-vars": "warn",
     "no-console": "warn",
     "func-names": "off",
+    "object-curly-newline": "off",
     "no-process-exit": "off",
     "class-methods-use-this": "off",
     "comma-dangle": ["error", "never"],
@@ -22,6 +23,7 @@
     "no-restricted-syntax": "off",
     "prefer-const": "warn",
     "no-lonely-if": "off",
+    "default-case": 1,
     "eqeqeq": "warn",
     "prefer-destructuring": "off",
     "lines-between-class-members": "off",
@@ -32,7 +34,10 @@
     "import/first": "off",
     "consistent-return": "off",
     "no-useless-escape": "off",
-    "linebreak-style": "off"
+    "linebreak-style": "off",
+    "arrow-parens": "off",
+    "arrow-body-style": "warn",
+    "@typescript-eslint/comma-dangle": "off"
   },
   "parserOptions": {
     "parser": "@typescript-eslint/parser",

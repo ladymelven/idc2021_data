@@ -1,19 +1,14 @@
-/******/ "use strict";
-
 function memoize(func) {
     const cache = new Map();
     return (...args) => {
         if (cache.has(args)) {
             return cache.get(args);
         }
-        else {
-            const result = func(...args);
-            cache.set(args, result);
-            return result;
-        }
+        const result = func(...args);
+        cache.set(args, result);
+        return result;
     };
 }
-
 function sortData(entities) {
     //мы работаем только с этими сущностями, issues и projects нам не нужны
     //будут нужны, их легко сюда добавить
@@ -40,26 +35,29 @@ function sortData(entities) {
             case 'Sprint':
                 sprints.push(entity);
                 break;
+            //no-default
         }
     });
     return { users, comments, commits, summaries, sprints };
 }
 
-function filterData(data, id) {
-    //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
-    const sprint = data.sprints.filter((sprint) => sprint.id === id)[0];
-    const filteredComments = data.comments.filter((comment) => {
-        //чтобы не впилиться в ошибки при сравнении Integer и Float, округляем
-        return Math.floor(comment.createdAt) >= sprint.startAt &&
-            Math.floor(comment.createdAt) <= sprint.finishAt;
-    });
-    const filteredCommits = exports.filterCommitsBySprint(data.commits, sprint);
-    return { comments: filteredComments, commits: filteredCommits, sprint };
-}
 function baseFilterCommitsBySprint(commits, sprint) {
     return commits.filter((commit) => {
         return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
     });
+}
+
+function filterData(data, id) {
+    //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
+    const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
+    const filteredComments = data.comments.filter(comment => {
+        //чтобы не впилиться в ошибки при сравнении Integer и Float, округляем
+        //eslint-ignore
+        return Math.floor(comment.createdAt) >= currSprint.startAt
+            && Math.floor(comment.createdAt) <= currSprint.finishAt;
+    });
+    const filteredCommits = exports.filterCommitsBySprint(data.commits, currSprint);
+    return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
 }
 
 function setWordEnding(num, variants) {
@@ -76,19 +74,15 @@ function baseGetAuthorId(unit) {
     if (typeof unit.author === 'number') {
         return unit.author;
     }
-    if (unit.author.hasOwnProperty('id')) {
+    if (unit.author.id) {
         return unit.author.id;
     }
 }
-
+const getAuthorId = memoize(baseGetAuthorId);
 function baseFilterByUser(data, id) {
     // @ts-ignore
     return data.filter((unit) => getAuthorId(unit) === id);
 }
-
-const getAuthorId = memoize(baseGetAuthorId);
-const filterByUser = memoize(baseFilterByUser);
-const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
 
 function rankUsers(users, commits, comments, identifier, stopper) {
     let text = '';
@@ -99,7 +93,7 @@ function rankUsers(users, commits, comments, identifier, stopper) {
             map = users.map((user) => {
                 return {
                     id: user.id,
-                    frequency: filterByUser(commits, user.id).length,
+                    frequency: filterByUser(commits, user.id).length
                 };
             });
             text = '';
@@ -121,12 +115,10 @@ function rankUsers(users, commits, comments, identifier, stopper) {
         //no-default
     }
     const ranked = map.sort((unit1, unit2) => {
-        if (unit1.frequency !== unit2.frequency) {
-            return unit2.frequency - unit1.frequency;
-        }
-        else {
+        if (unit1.frequency === unit2.frequency) {
             return unit1.id - unit2.id;
         }
+        return unit2.frequency - unit1.frequency;
     });
     let slice;
     if (stopper) {
@@ -183,7 +175,8 @@ function getBreakdown(commits, summaries, limits) {
                 size += summaryObj.removed;
             }
         });
-        // проверяем, под какой из лимитов попадает размер коммита; если больше самого большого, записываем в конец
+        // проверяем, под какой из лимитов попадает размер;
+        // если больше самого большого, записываем в конец
         for (let i = 0; i <= limits.length; i++) {
             if (limits[i] && size <= limits[i]) {
                 values[i]++;
@@ -258,13 +251,16 @@ function prepareActivity(commits) {
         sat: []
     };
     for (let key in heatmap) {
-        for (let i = 0; i < 24; i++) {
-            heatmap[key].push(0);
+        if ({}.hasOwnProperty.call(heatmap, key)) {
+            for (let i = 0; i < 24; i++) { // @ts-ignore
+                heatmap[key].push(0);
+            }
         }
     }
     commits.forEach(commit => {
         const datetime = new Date(commit.timestamp);
         const dayName = dayNames[datetime.getDay()];
+        // @ts-ignore
         heatmap[dayName][datetime.getHours()]++;
     });
     return heatmap;
@@ -307,7 +303,11 @@ function prepareData(entities, identifier) {
         },
         {
             alias: 'diagram',
-            data: Object.assign({ title: 'Размер коммитов', subtitle: filtered.sprint.name }, prepareDiagram(filtered.commits, filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries))
+            data: {
+                title: 'Размер коммитов',
+                subtitle: filtered.sprint.name,
+                ...prepareDiagram(filtered.commits, filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries)
+            }
         },
         {
             alias: 'activity',
@@ -320,4 +320,9 @@ function prepareData(entities, identifier) {
     ];
 }
 
+// const data = require('./data/input.json');
+// console.time('func');
+// console.log(prepareData(data, { sprintId: 977 }));
+// console.timeEnd('func');
 module.exports = { prepareData };
+

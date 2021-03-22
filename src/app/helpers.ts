@@ -6,12 +6,12 @@ function memoize(func: any) {
   return (...args: any) => {
     if (cache.has(args)) {
       return cache.get(args);
-    } else {
-      const result = func(...args);
-      cache.set(args, result);
-      return result;
     }
-  }
+
+    const result = func(...args);
+    cache.set(args, result);
+    return result;
+  };
 }
 
 export function sortData(entities: Entity[]) {
@@ -41,11 +41,19 @@ export function sortData(entities: Entity[]) {
       case 'Sprint':
         sprints.push(entity);
         break;
+      //no-default
     }
-  })
+  });
 
   return { users, comments, commits, summaries, sprints };
 }
+
+function baseFilterCommitsBySprint(commits: Commit[], sprint: Sprint) {
+  return commits.filter((commit) => {
+    return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
+  });
+}
+export const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
 
 export function filterData(
   data: {
@@ -55,25 +63,20 @@ export function filterData(
     summaries: Summary[],
     sprints: Sprint[]
   },
-  id: number,
+  id: number
 ) {
   //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
-  const sprint = data.sprints.filter((sprint) => sprint.id === id)[0];
+  const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
 
-  const filteredComments = data.comments.filter((comment) => {
+  const filteredComments = data.comments.filter(comment => {
     //чтобы не впилиться в ошибки при сравнении Integer и Float, округляем
-    return Math.floor(comment.createdAt) >= sprint.startAt &&
-      Math.floor(comment.createdAt) <= sprint.finishAt;
+    //eslint-ignore
+    return Math.floor(comment.createdAt) >= currSprint.startAt
+      && Math.floor(comment.createdAt) <= currSprint.finishAt;
   });
-  const filteredCommits = filterCommitsBySprint(data.commits, sprint);
+  const filteredCommits = filterCommitsBySprint(data.commits, currSprint);
 
-  return { comments: filteredComments, commits: filteredCommits, sprint };
-}
-
-function baseFilterCommitsBySprint(commits: Commit[], sprint: Sprint) {
-  return commits.filter((commit) => {
-    return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
-  });
+  return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
 }
 
 export function setWordEnding(num: number, variants: Array<string>) {
@@ -88,16 +91,14 @@ export function setWordEnding(num: number, variants: Array<string>) {
 function baseGetAuthorId(unit: Comment | Commit) {
   if (typeof unit.author === 'number') {
     return unit.author;
-  } if (unit.author.hasOwnProperty('id')) {
+  } if (unit.author.id) {
     return unit.author.id;
   }
 }
+const getAuthorId = memoize(baseGetAuthorId);
 
 function baseFilterByUser(data: Commit[] | Comment[], id: number) {
   // @ts-ignore
   return data.filter((unit: Commit | Comment) => getAuthorId(unit) === id);
 }
-
-const getAuthorId = memoize(baseGetAuthorId);
 export const filterByUser = memoize(baseFilterByUser);
-export const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
