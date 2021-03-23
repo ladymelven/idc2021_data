@@ -299,7 +299,8 @@ function prepareData(entities, identifier) {
         {
             alias: 'diagram',
             data: {
-                title: 'Размер коммитов', subtitle: filtered.sprint.name,
+                title: 'Размер коммитов',
+                subtitle: filtered.sprint.name,
                 ...prepareDiagram(filtered.commits, filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries)
             }
         },
@@ -314,4 +315,8 @@ function prepareData(entities, identifier) {
     ];
 }
 
+// const data = require('./data/input.json');
+// console.time('func');
+// console.log(prepareData(data, { sprintId: 977 }));
+// console.timeEnd('func');
 module.exports = { prepareData };
