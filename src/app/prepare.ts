@@ -16,7 +16,7 @@ function rankUsers(users: User[],
   identifier: 'commits' | 'likes',
   stopper?: number) {
   let text = '';
-  let endings = ['', 'а', 'ов'];
+  let endings: Array<string> = [];
   let map: { id: number, frequency: number }[] = [];
 
   switch (identifier) {
@@ -42,6 +42,7 @@ function rankUsers(users: User[],
         };
       });
       text = ' голос';
+      endings = ['', 'а', 'ов'];
       break;
     //no-default
   }
@@ -153,7 +154,7 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
 
     // может быть краевой случай, когда одинаково по размерам в текущем и прошлом, тогда ставлю '=='
     if (currentValue !== prevValue) {
-      diffText = `${diffSign}${Math.abs(value - prevValue)}`;
+      diffText = `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
     } else {
       diffText = '==';
     }
@@ -161,7 +162,7 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
     if (higher) {
       title = `${lower} — ${higher} строк${setWordEnding(higher, ['а', 'и', ''])}`;
     } else {
-      title = `> ${lower} строк${setWordEnding(lower, ['а', 'и', ''])}`;
+      title = `> ${lower} строк${setWordEnding(lower, ['и', '', ''])}`;
     }
 
     //потенциально дорогая операция, но у нас же никогда не будет много категорий?
@@ -263,7 +264,7 @@ export default function prepareData(
     {
       alias: 'activity',
       data: {
-        title: 'Коммиты, 1 неделя',
+        title: 'Коммиты',
         subtitle: filtered.sprint.name,
         data: prepareActivity(filtered.commits)
       }

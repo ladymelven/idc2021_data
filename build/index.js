@@ -59,10 +59,11 @@ function filterData(data, id) {
     return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
 }
 function setWordEnding(num, variants) {
-    if (num === 1) {
+    if (num === 1 || num % 100 === 1) {
         return variants[0];
     }
-    if (num !== 0 && (num < 5 || (num > 20 && (num % 10) !== 0 && (num % 10) < 5))) {
+    if ((num % 100 !== 0 && num % 100 < 5) ||
+        (num > 20 && num % 100 > 20 && (num % 10) !== 0 && (num % 10) < 5)) {
         return variants[1];
     }
     return variants[2];
@@ -84,7 +85,7 @@ const filterByUser = memoize(baseFilterByUser);
 
 function rankUsers(users, commits, comments, identifier, stopper) {
     let text = '';
-    let endings = ['', 'а', 'ов'];
+    let endings = [];
     let map = [];
     switch (identifier) {
         case 'commits':
@@ -109,6 +110,7 @@ function rankUsers(users, commits, comments, identifier, stopper) {
                 };
             });
             text = ' голос';
+            endings = ['', 'а', 'ов'];
             break;
         //no-default
     }
@@ -209,7 +211,7 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
         const diffSign = value > prevValue ? '+' : '-';
         // может быть краевой случай, когда одинаково по размерам в текущем и прошлом, тогда ставлю '=='
         if (currentValue !== prevValue) {
-            diffText = `${diffSign}${Math.abs(value - prevValue)}`;
+            diffText = `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
         }
         else {
             diffText = '==';
@@ -218,7 +220,7 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
             title = `${lower} — ${higher} строк${setWordEnding(higher, ['а', 'и', ''])}`;
         }
         else {
-            title = `> ${lower} строк${setWordEnding(lower, ['а', 'и', ''])}`;
+            title = `> ${lower} строк${setWordEnding(lower, ['и', '', ''])}`;
         }
         //потенциально дорогая операция, но у нас же никогда не будет много категорий?
         categories.unshift({
@@ -299,12 +301,12 @@ function prepareData(entities, identifier) {
             data: {
                 title: 'Размер коммитов', subtitle: filtered.sprint.name,
                 ...prepareDiagram(filtered.commits, filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries)
-            },
+            }
         },
         {
             alias: 'activity',
             data: {
-                title: 'Коммиты, 1 неделя',
+                title: 'Коммиты',
                 subtitle: filtered.sprint.name,
                 data: prepareActivity(filtered.commits)
             }
