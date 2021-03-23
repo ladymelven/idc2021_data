@@ -40,13 +40,12 @@ function sortData(entities) {
     });
     return { users, comments, commits, summaries, sprints };
 }
-
 function baseFilterCommitsBySprint(commits, sprint) {
     return commits.filter((commit) => {
         return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
     });
 }
-
+const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
 function filterData(data, id) {
     //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
     const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
@@ -56,10 +55,9 @@ function filterData(data, id) {
         return Math.floor(comment.createdAt) >= currSprint.startAt
             && Math.floor(comment.createdAt) <= currSprint.finishAt;
     });
-    const filteredCommits = exports.filterCommitsBySprint(data.commits, currSprint);
+    const filteredCommits = filterCommitsBySprint(data.commits, currSprint);
     return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
 }
-
 function setWordEnding(num, variants) {
     if (num === 1) {
         return variants[0];
@@ -69,7 +67,6 @@ function setWordEnding(num, variants) {
     }
     return variants[2];
 }
-
 function baseGetAuthorId(unit) {
     if (typeof unit.author === 'number') {
         return unit.author;
@@ -83,6 +80,7 @@ function baseFilterByUser(data, id) {
     // @ts-ignore
     return data.filter((unit) => getAuthorId(unit) === id);
 }
+const filterByUser = memoize(baseFilterByUser);
 
 function rankUsers(users, commits, comments, identifier, stopper) {
     let text = '';
@@ -138,7 +136,6 @@ function rankUsers(users, commits, comments, identifier, stopper) {
         };
     });
 }
-
 function prepareChart(commits, sprints, activeId) {
     const sortedSprints = sprints.sort((sprint1, sprint2) => {
         return sprint1.id - sprint2.id;
@@ -155,7 +152,6 @@ function prepareChart(commits, sprints, activeId) {
         return sprintInfo;
     });
 }
-
 function getBreakdown(commits, summaries, limits) {
     const values = [0];
     // у нас 4 категории, но ничто не мешает разбить на любое другое количество
@@ -189,7 +185,6 @@ function getBreakdown(commits, summaries, limits) {
     });
     return values;
 }
-
 function prepareDiagram(currentCommits, prevCommits, summaries) {
     const currentValue = currentCommits.length;
     const differenceSign = currentValue > prevCommits.length ? '+' : '-';
@@ -238,7 +233,6 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
         categories
     };
 }
-
 function prepareActivity(commits) {
     const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const heatmap = {
@@ -265,7 +259,6 @@ function prepareActivity(commits) {
     });
     return heatmap;
 }
-
 function prepareData(entities, identifier) {
     //сначала раскидываем дату по типам, чтобы не проходиться каждый раз по всему массиву
     const sorted = sortData(entities);
@@ -304,10 +297,9 @@ function prepareData(entities, identifier) {
         {
             alias: 'diagram',
             data: {
-                title: 'Размер коммитов',
-                subtitle: filtered.sprint.name,
+                title: 'Размер коммитов', subtitle: filtered.sprint.name,
                 ...prepareDiagram(filtered.commits, filterCommitsBySprint(sorted.commits, prevSprint), sorted.summaries)
-            }
+            },
         },
         {
             alias: 'activity',
@@ -320,9 +312,4 @@ function prepareData(entities, identifier) {
     ];
 }
 
-// const data = require('./data/input.json');
-// console.time('func');
-// console.log(prepareData(data, { sprintId: 977 }));
-// console.timeEnd('func');
 module.exports = { prepareData };
-

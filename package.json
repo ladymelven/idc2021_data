@@ -4,35 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --mode production",
-    "start": "cross-env NODE_ENV=development webpack serve --mode development",
-    "dev": "cross-env NODE_ENV=development webpack --mode development",
     "test": "jest"
   },
   "author": "ladymelven",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-eslint": "^8.0.1",
+    "@rollup/plugin-node-resolve": "^11.2.0",
+    "@rollup/plugin-typescript": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^8.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.22.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-webpack-plugin": "^2.5.2",
-    "extract-loader": "^5.1.0",
-    "html-webpack-plugin": "^5.3.1",
+    "import": "0.0.6",
     "jest": "^26.6.3",
-    "terser-webpack-plugin": "^5.1.1",
-    "webpack": "^5.25.0",
-    "webpack-cli": "^4.5.0",
-    "webpack-copy-plugin": "0.0.4",
-    "webpack-dev-server": "^3.11.2"
-  },
-  "dependencies": {
-    "ts-loader": "^8.0.18",
     "typescript": "^4.2.3"
-  }
+  },
+  "dependencies": {}
 }
