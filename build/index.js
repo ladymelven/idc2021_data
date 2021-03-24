@@ -1,5 +1,6 @@
 function memoize(func) {
     const cache = new Map();
+    //здесь any, потому что я планирую оборачивать функции с разными аргументами, это реально any
     return (...args) => {
         if (cache.has(args)) {
             return cache.get(args);
@@ -51,7 +52,6 @@ function filterData(data, id) {
     const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
     const filteredComments = data.comments.filter(comment => {
         //чтобы не впилиться в ошибки при сравнении Integer и Float, округляем
-        //eslint-ignore
         return Math.floor(comment.createdAt) >= currSprint.startAt
             && Math.floor(comment.createdAt) <= currSprint.finishAt;
     });
@@ -59,7 +59,7 @@ function filterData(data, id) {
     return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
 }
 function setWordEnding(num, variants) {
-    if (num === 1 || num % 100 === 1) {
+    if (num === 1 || num % 100 === 1 || (num > 20 && num % 10 === 1)) {
         return variants[0];
     }
     if ((num % 100 !== 0 && num % 100 < 5) ||
@@ -249,6 +249,7 @@ function prepareActivity(commits) {
     for (let key in heatmap) {
         if ({}.hasOwnProperty.call(heatmap, key)) {
             for (let i = 0; i < 24; i++) { // @ts-ignore
+                //я точно знаю, что это поле там есть, я сгенерировала его ~5 строчек назад
                 heatmap[key].push(0);
             }
         }
@@ -257,6 +258,7 @@ function prepareActivity(commits) {
         const datetime = new Date(commit.timestamp);
         const dayName = dayNames[datetime.getDay()];
         // @ts-ignore
+        //same as above, только что сгенерированные поля
         heatmap[dayName][datetime.getHours()]++;
     });
     return heatmap;

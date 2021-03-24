@@ -195,6 +195,7 @@ function prepareActivity(commits: Commit[]) {
   for (let key in heatmap) {
     if ({}.hasOwnProperty.call(heatmap, key)) {
       for (let i = 0; i < 24; i++) { // @ts-ignore
+        //я точно знаю, что это поле там есть, я сгенерировала его ~5 строчек назад
         heatmap[key].push(0);
       }
     }
@@ -204,6 +205,7 @@ function prepareActivity(commits: Commit[]) {
     const datetime = new Date(commit.timestamp);
     const dayName = dayNames[datetime.getDay()];
     // @ts-ignore
+    //same as above, только что сгенерированные поля
     heatmap[dayName][datetime.getHours()]++;
   });
 

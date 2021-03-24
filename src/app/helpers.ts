@@ -1,8 +1,9 @@
 import { Comment, Commit, Entity, Sprint, Summary, User } from '../types/types';
 
-function memoize(func: any) {
+function memoize(func: Function) {
   const cache = new Map();
 
+  //здесь any, потому что я планирую оборачивать функции с разными аргументами, это реально any
   return (...args: any) => {
     if (cache.has(args)) {
       return cache.get(args);
@@ -70,7 +71,6 @@ export function filterData(
 
   const filteredComments = data.comments.filter(comment => {
     //чтобы не впилиться в ошибки при сравнении Integer и Float, округляем
-    //eslint-ignore
     return Math.floor(comment.createdAt) >= currSprint.startAt
       && Math.floor(comment.createdAt) <= currSprint.finishAt;
   });
@@ -80,7 +80,7 @@ export function filterData(
 }
 
 export function setWordEnding(num: number, variants: Array<string>) {
-  if (num === 1 || num % 100 === 1) {
+  if (num === 1 || num % 100 === 1 || (num > 20 && num % 10 === 1)) {
     return variants[0];
   } if ((num % 100 !== 0 && num % 100 < 5) ||
     (num > 20 && num % 100 > 20 && (num % 10) !== 0 && (num % 10) < 5)

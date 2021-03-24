@@ -9,9 +9,11 @@ console.time('empty');
 const emptySprintData = prepareData(rawData, { sprintId: 996 });
 console.timeEnd('empty');
 
+console.log(JSON.stringify(data));
+
 test('passes smoke test', () => {
   expect(data).toBeTruthy();
-})
+});
 
 test('returns an array of 5', () => {
   expect(data.length).toBe(5);
@@ -60,7 +62,7 @@ describe.each([
   [ data[2].alias, data[2].data, 'values' ],
   [ data[3].alias, data[3].data, 'categories' ],
   [ data[4].alias, data[4].data, 'data' ]
-])('subtitle', (alias, fact, prop) => {
+])('data', (alias, fact, prop) => {
   test(`${alias} has ${prop}`, () => {
     expect(fact).toHaveProperty(prop);
   })
@@ -74,7 +76,6 @@ describe.each([
   [ emptySprintData[4].data.title]
 ])('returns title on empty sprint', (fact) => {
   test('return title', () => {
-    // expect(fact).toBeGreaterThan(0);
     expect(fact).toBeTruthy();
   })
 });
