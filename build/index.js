@@ -59,7 +59,7 @@ function filterData(data, id) {
     return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
 }
 function setWordEnding(num, variants) {
-    if (num === 1 || num % 100 === 1 || (num > 20 && num % 10 === 1)) {
+    if (num === 1 || num % 100 === 1 || (num > 20 && num % 100 > 20 && num % 10 === 1)) {
         return variants[0];
     }
     if ((num % 100 !== 0 && num % 100 < 5) ||
