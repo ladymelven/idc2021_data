@@ -115,9 +115,9 @@ function rankUsers(users, commits, comments, identifier, stopper) {
         //no-default
     }
     const ranked = map.sort((unit1, unit2) => {
-        if (unit1.frequency === unit2.frequency) {
-            return unit1.id - unit2.id;
-        }
+        // if (unit1.frequency === unit2.frequency) {
+        //   return unit1.id - unit2.id;
+        // }
         return unit2.frequency - unit1.frequency;
     });
     let slice;
@@ -211,7 +211,8 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
         const diffSign = value > prevValue ? '+' : '-';
         // может быть краевой случай, когда одинаково по размерам в текущем и прошлом, тогда ставлю '=='
         if (currentValue !== prevValue) {
-            diffText = `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
+            diffText =
+                `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
         }
         else {
             diffText = '==';
