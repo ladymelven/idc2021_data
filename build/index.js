@@ -51,9 +51,7 @@ function filterData(data, id) {
     //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
     const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
     const filteredComments = data.comments.filter(comment => {
-        //чтобы не впилиться в ошибки при сравнении Integer и Float, округляем
-        return Math.floor(comment.createdAt) >= currSprint.startAt
-            && Math.floor(comment.createdAt) <= currSprint.finishAt;
+        return comment.createdAt > currSprint.startAt && comment.createdAt <= currSprint.finishAt;
     });
     const filteredCommits = filterCommitsBySprint(data.commits, currSprint);
     return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
@@ -209,7 +207,7 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
         const value = currentValues[i];
         const prevValue = prevValues[i];
         const diffSign = value > prevValue ? '+' : '-';
-        // может быть краевой случай, когда одинаково по размерам в текущем и прошлом, тогда ставлю '=='
+        // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
         if (currentValue !== prevValue) {
             diffText =
                 `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
@@ -318,8 +316,4 @@ function prepareData(entities, identifier) {
     ];
 }
 
-// const data = require('./data/input.json');
-// console.time('func');
-// console.log(prepareData(data, { sprintId: 977 }));
-// console.timeEnd('func');
 module.exports = { prepareData };

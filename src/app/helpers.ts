@@ -70,9 +70,7 @@ export function filterData(
   const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
 
   const filteredComments = data.comments.filter(comment => {
-    //чтобы не впилиться в ошибки при сравнении Integer и Float, округляем
-    return Math.floor(comment.createdAt) >= currSprint.startAt
-      && Math.floor(comment.createdAt) <= currSprint.finishAt;
+    return comment.createdAt > currSprint.startAt && comment.createdAt <= currSprint.finishAt;
   });
   const filteredCommits = filterCommitsBySprint(data.commits, currSprint);
 

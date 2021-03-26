@@ -152,7 +152,7 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
     const prevValue = prevValues[i];
     const diffSign = value > prevValue ? '+' : '-';
 
-    // может быть краевой случай, когда одинаково по размерам в текущем и прошлом, тогда ставлю '=='
+    // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
     if (currentValue !== prevValue) {
       diffText =
         `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;

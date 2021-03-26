@@ -4,12 +4,11 @@ const sample = require('../data/sample.json');
 
 console.time('prepare');
 const data = prepareData(rawData, { sprintId: 977 });
+// const data = prepareData(rawData, { sprintId: 991 });
 console.timeEnd('prepare');
 console.time('empty');
 const emptySprintData = prepareData(rawData, { sprintId: 996 });
 console.timeEnd('empty');
-
-console.log(JSON.stringify(data));
 
 test('passes smoke test', () => {
   expect(data).toBeTruthy();
