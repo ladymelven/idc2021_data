@@ -48,9 +48,9 @@ function rankUsers(users: User[],
   }
 
   const ranked = map.sort((unit1, unit2) => {
-    // if (unit1.frequency === unit2.frequency) {
-    //   return unit1.id - unit2.id;
-    // }
+    if (unit1.frequency === unit2.frequency) {
+      return unit1.id - unit2.id;
+    }
     return unit2.frequency - unit1.frequency;
   });
   let slice;
