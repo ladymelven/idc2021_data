@@ -80,7 +80,7 @@ export function filterData(
 export function setWordEnding(num: number, variants: Array<string>) {
   if (num === 1 || num % 100 === 1 || (num > 20 && num % 100 > 20 && num % 10 === 1)) {
     return variants[0];
-  } if ((num % 100 !== 0 && num % 100 < 5) ||
+  } if ((num % 100 && num % 100 < 5) ||
     (num > 20 && num % 100 > 20 && (num % 10) !== 0 && (num % 10) < 5)
   ) {
     return variants[1];

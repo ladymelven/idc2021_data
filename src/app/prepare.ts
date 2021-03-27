@@ -150,7 +150,7 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
     let diffText = '';
     const value = currentValues[i];
     const prevValue = prevValues[i];
-    const diffSign = value > prevValue ? '+' : '—';
+    const diffSign = value > prevValue ? '+' : '-';
 
     // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
     if (currentValue !== prevValue) {
