@@ -113,11 +113,11 @@ function getBreakdown(commits: Commit[], summaries: Summary[], limits: Array<num
     });
 
     // проверяем, под какой из лимитов попадает размер;
-    // если больше самого большого, записываем в конец
     for (let i = 0; i <= limits.length; i++) {
       if (limits[i] && size <= limits[i]) {
         values[i]++;
         break;
+      // если больше самого большого, записываем в конец
       } else if (!limits[i]) {
         values[values.length - 1]++;
       }
@@ -153,7 +153,7 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
     const diffSign = value > prevValue ? '+' : '-';
 
     // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
-    if (currentValue !== prevValue) {
+    if (value !== prevValue) {
       diffText =
         `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
     } else {

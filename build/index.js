@@ -57,11 +57,11 @@ function filterData(data, id) {
     return { comments: filteredComments, commits: filteredCommits, sprint: currSprint };
 }
 function setWordEnding(num, variants) {
-    if (num === 1 || num % 100 === 1 || (num > 20 && num % 100 > 20 && num % 10 === 1)) {
+    if (num % 100 === 1 || (num % 100 > 20 && num % 10 === 1)) {
         return variants[0];
     }
-    if ((num % 100 && num % 100 < 5) ||
-        (num > 20 && num % 100 > 20 && (num % 10) !== 0 && (num % 10) < 5)) {
+    if ((num % 100 !== 0 && num % 100 < 5) ||
+        (num % 100 > 20 && (num % 10) !== 0 && (num % 10) < 5)) {
         return variants[1];
     }
     return variants[2];
@@ -172,11 +172,11 @@ function getBreakdown(commits, summaries, limits) {
             }
         });
         // проверяем, под какой из лимитов попадает размер;
-        // если больше самого большого, записываем в конец
         for (let i = 0; i <= limits.length; i++) {
             if (limits[i] && size <= limits[i]) {
                 values[i]++;
                 break;
+                // если больше самого большого, записываем в конец
             }
             else if (!limits[i]) {
                 values[values.length - 1]++;
@@ -208,7 +208,7 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
         const prevValue = prevValues[i];
         const diffSign = value > prevValue ? '+' : '-';
         // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
-        if (currentValue !== prevValue) {
+        if (value !== prevValue) {
             diffText =
                 `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
         }

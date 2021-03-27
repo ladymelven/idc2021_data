@@ -10,6 +10,9 @@ console.time('empty');
 const emptySprintData = prepareData(rawData, { sprintId: 996 });
 console.timeEnd('empty');
 
+// console.log(data[3].data);
+// console.log(data[0].data.users);
+
 test('passes smoke test', () => {
   expect(data).toBeTruthy();
 });
@@ -140,7 +143,12 @@ test('diagram difference text matches sample', () => {
 });
 
 test('diagram categories match sample', () => {
-  expect(JSON.stringify(data[3].data.categories)).toEqual(JSON.stringify(sample[3].data.categories));
+  data[3].data.categories.forEach((category, index) => {
+    const sampleCategory = sample[3].data.categories[index];
+    expect(category.title).toEqual(sampleCategory.title);
+    expect(category.valueText).toEqual(sampleCategory.valueText);
+    expect(category.differenceText).toEqual(sampleCategory.differenceText);
+  });
 });
 
 test('activity data has 7 days of the week 24 hours each', () => {
