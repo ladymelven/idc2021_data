@@ -49,7 +49,7 @@ function rankUsers(users: User[],
 
   const ranked = map.sort((unit1, unit2) => {
     if (unit1.frequency === unit2.frequency) {
-      return unit2.id - unit1.id;
+      return unit1.id - unit2.id;
     }
     return unit2.frequency - unit1.frequency;
   });
@@ -150,7 +150,7 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
     let diffText = '';
     const value = currentValues[i];
     const prevValue = prevValues[i];
-    const diffSign = value > prevValue ? '+' : '-';
+    const diffSign = value > prevValue ? '+' : '—';
 
     // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
     if (currentValue !== prevValue) {
