@@ -50,6 +50,10 @@ export function sortData(entities: Entity[]) {
 }
 
 function baseFilterCommitsBySprint(commits: Commit[], sprint: Sprint) {
+  if (!sprint) {
+    return null;
+  }
+
   return commits.filter((commit) => {
     return commit.timestamp >= sprint.startAt && commit.timestamp <= sprint.finishAt;
   });

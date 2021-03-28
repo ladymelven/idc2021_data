@@ -129,18 +129,18 @@ function getBreakdown(commits: Commit[], summaries: Summary[], limits: Array<num
 
 function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summaries: Summary[]) {
   const currentValue = currentCommits.length;
-  const differenceSign = currentValue > prevCommits.length ? '+' : '-';
-  let differenceText: string;
+  let differenceText = '';
 
-  if (currentValue !== prevCommits.length) {
+  if (prevCommits && currentValue !== prevCommits.length) {
+    const differenceSign = currentValue > prevCommits.length ? '+' : '-';
     differenceText = `${differenceSign}${Math.abs(currentValue - prevCommits.length)} с прошлого спринта`;
-  } else {
+  } else if (prevCommits) {
     differenceText = 'как и в прошлом спринте';
   }
 
   const limits = [100, 500, 1000];
   const currentValues = getBreakdown(currentCommits, summaries, limits);
-  const prevValues = getBreakdown(prevCommits, summaries, limits);
+  const prevValues = prevCommits ? getBreakdown(prevCommits, summaries, limits) : null;
   const categories = [];
 
   for (let i = 0; i <= limits.length; i++) {
@@ -149,13 +149,18 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
     let title = '';
     let diffText = '';
     const value = currentValues[i];
-    const prevValue = prevValues[i];
-    const diffSign = value > prevValue ? '+' : '-';
+    let prevValue = null;
+    if (prevValues) {
+      prevValue = prevValues[i];
+    }
 
     // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
-    if (value !== prevValue) {
+    if (prevValue && value !== prevValue) {
+      const diffSign = value > prevValue ? '+' : '-';
       diffText =
         `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
+    } else if (!prevValue) {
+      diffText = '';
     } else {
       diffText = '==';
     }

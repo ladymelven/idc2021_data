@@ -143,12 +143,7 @@ test('diagram difference text matches sample', () => {
 });
 
 test('diagram categories match sample', () => {
-  data[3].data.categories.forEach((category, index) => {
-    const sampleCategory = sample[3].data.categories[index];
-    expect(category.title).toEqual(sampleCategory.title);
-    expect(category.valueText).toEqual(sampleCategory.valueText);
-    expect(category.differenceText).toEqual(sampleCategory.differenceText);
-  });
+  expect(JSON.stringify(data[3].data.categories)).toEqual(JSON.stringify(sample[3].data.categories));
 });
 
 test('activity data has 7 days of the week 24 hours each', () => {
