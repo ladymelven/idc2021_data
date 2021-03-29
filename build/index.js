@@ -122,8 +122,13 @@ function rankUsers(users, commits, comments, identifier, stopper) {
         return unit2.frequency - unit1.frequency;
     });
     let slice;
+    const zeroCommitsIndex = ranked.findIndex(unit => unit.frequency === 0);
     if (stopper) {
         slice = ranked.slice(0, stopper);
+    }
+    else if (zeroCommitsIndex >= 0) {
+        console.log(zeroCommitsIndex);
+        slice = ranked.slice(zeroCommitsIndex);
     }
     else {
         slice = ranked;
@@ -218,11 +223,11 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
             diffText =
                 `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
         }
-        else if (!prevValue) {
-            diffText = '';
+        else if (prevValue) {
+            diffText = '0 коммитов';
         }
         else {
-            diffText = '==';
+            diffText = '';
         }
         if (higher) {
             title = `${lower} — ${higher} строк${setWordEnding(higher, ['а', 'и', ''])}`;

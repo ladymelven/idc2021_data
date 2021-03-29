@@ -53,12 +53,17 @@ function rankUsers(users: User[],
     }
     return unit2.frequency - unit1.frequency;
   });
+
   let slice;
+  const zeroCommitsIndex = ranked.findIndex(unit => unit.frequency === 0);
 
   if (stopper) {
     slice = ranked.slice(0, stopper);
-  } else {
-    slice = ranked;
+  } else if (zeroCommitsIndex >= 0) {
+    console.log(zeroCommitsIndex);
+    slice = ranked.slice(zeroCommitsIndex);
+    } else {
+      slice = ranked;
   }
 
   return slice.map((unit) => {
@@ -159,10 +164,10 @@ function prepareDiagram(currentCommits: Commit[], prevCommits: Commit[], summari
       const diffSign = value > prevValue ? '+' : '-';
       diffText =
         `${diffSign}${Math.abs(value - prevValue)} коммит${setWordEnding(Math.abs(value - prevValue), ['', 'а', 'ов'])}`;
-    } else if (!prevValue) {
-      diffText = '';
+    } else if (prevValue) {
+      diffText = '0 коммитов';
     } else {
-      diffText = '==';
+      diffText = '';
     }
 
     if (higher) {
