@@ -104,6 +104,3 @@ export type Entity =
   | Commit
   | Summary
   | Sprint;
-
-export type EntityId = Entity['id'];
-export type EntityType = Entity['type'];

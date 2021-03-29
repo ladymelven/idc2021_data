@@ -51,8 +51,10 @@ function baseFilterCommitsBySprint(commits, sprint) {
 }
 const filterCommitsBySprint = memoize(baseFilterCommitsBySprint);
 function filterData(data, id) {
-    //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
-    const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
+    const currSprint = data.sprints.find(sprint => sprint.id === id);
+    if (!currSprint) {
+        return { comments: [], commits: [], sprint: null };
+    }
     const filteredComments = data.comments.filter(comment => {
         return comment.createdAt > currSprint.startAt && comment.createdAt <= currSprint.finishAt;
     });
@@ -73,7 +75,7 @@ function baseGetAuthorId(unit) {
     if (typeof unit.author === 'number') {
         return unit.author;
     }
-    if (unit.author.id) {
+    else if (unit.author.id) {
         return unit.author.id;
     }
 }
@@ -123,11 +125,11 @@ function rankUsers(users, commits, comments, identifier, stopper) {
     });
     let slice;
     const zeroCommitsIndex = ranked.findIndex(unit => unit.frequency === 0);
+    //stopper здесь на тот случай, если хотим выводить первых 3-5 юзеров (как в первом задании)
     if (stopper) {
         slice = ranked.slice(0, stopper);
     }
     else if (zeroCommitsIndex >= 0) {
-        console.log(zeroCommitsIndex);
         slice = ranked.slice(0, zeroCommitsIndex);
     }
     else {
@@ -135,6 +137,8 @@ function rankUsers(users, commits, comments, identifier, stopper) {
     }
     return slice.map((unit) => {
         const { name, avatar } = users.filter((user) => unit.id === user.id)[0];
+        // текс = [сколько] [чего][окончание склонения]
+        //в легендах нет слов, изменяющихся при склонении полностью, поэтому окончание просто подставляем в конец
         const userText = unit.frequency + text + setWordEnding(unit.frequency, endings);
         return {
             id: unit.id,
@@ -217,7 +221,6 @@ function prepareDiagram(currentCommits, prevCommits, summaries) {
         if (prevValues) {
             prevValue = prevValues[i];
         }
-        // может быть краевой случай, когда одинаково в текущем и прошлом, тогда ставлю '=='
         if (prevValue && value !== prevValue) {
             const diffSign = value > prevValue ? '+' : '-';
             diffText =
@@ -262,7 +265,7 @@ function prepareActivity(commits) {
     for (let key in heatmap) {
         if ({}.hasOwnProperty.call(heatmap, key)) {
             for (let i = 0; i < 24; i++) { // @ts-ignore
-                //я точно знаю, что это поле там есть, я сгенерировала его ~5 строчек назад
+                //я точно знаю, что поле [key] там есть, я сгенерировала его ~5 строк назад
                 heatmap[key].push(0);
             }
         }
@@ -281,8 +284,11 @@ function prepareData(entities, identifier) {
     const sorted = sortData(entities);
     //потом сортируем то, что относится к текущему спринту (заодно получаем текущий спринт)
     const filtered = filterData(sorted, identifier.sprintId);
-    const prevSprint = sorted.sprints.filter(sprint => sprint.id === identifier.sprintId - 1)[0];
+    const prevSprint = sorted.sprints.find(sprint => sprint.id === identifier.sprintId - 1);
     const currentRank = rankUsers(sorted.users, filtered.commits, filtered.comments, 'commits');
+    if (!filtered.sprint) {
+        throw new Error('no such sprint');
+    }
     return [
         {
             alias: 'leaders',
@@ -329,5 +335,4 @@ function prepareData(entities, identifier) {
         }
     ];
 }
-
 module.exports = { prepareData };

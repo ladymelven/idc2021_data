@@ -1,16 +1,14 @@
-const prepareData = require('./prepare').default;
-const rawData = require('../data/input.json');
-const sample = require('../data/sample.json');
+const prepareData = require('./index').prepareData;
+const rawData = require('./data/input.json');
+const sample = require('./data/sample.json');
 
 console.time('prepare');
-// const data = prepareData(rawData, { sprintId: 977 });
-const data = prepareData(rawData, { sprintId: 991 });
+const data = prepareData(rawData, { sprintId: 977 });
+// const data = prepareData(rawData, { sprintId: 991 });
 console.timeEnd('prepare');
 console.time('empty');
 const emptySprintData = prepareData(rawData, { sprintId: 996 });
 console.timeEnd('empty');
-
-console.log(data[0].data.users);
 
 test('passes smoke test', () => {
   expect(data).toBeTruthy();
@@ -33,27 +31,19 @@ describe.each([
 });
 
 describe.each([
-  [ data[0].alias, data[0].data.title, sample[0].data.title ],
-  [ data[1].alias, data[1].data.title, sample[1].data.title ],
-  [ data[2].alias, data[2].data.title, sample[2].data.title ],
-  [ data[3].alias, data[3].data.title, sample[3].data.title ],
-  [ data[4].alias, data[4].data.title, sample[4].data.title ]
+  [ data[0].alias, data[0].data, sample[0].data ],
+  [ data[1].alias, data[1].data, sample[1].data ],
+  [ data[2].alias, data[2].data, sample[2].data ],
+  [ data[3].alias, data[3].data, sample[3].data ],
+  [ data[4].alias, data[4].data, sample[4].data ]
 ])('title', (alias, fact, expected) => {
-  test(`${alias} title is ${expected}`, () => {
-    expect(fact).toEqual(expected);
-  })
-});
+  test(`${alias} title is ${expected.title}`, () => {
+    expect(fact.title).toEqual(expected.title);
+  });
 
-describe.each([
-  [ data[0].alias, data[0].data.subtitle, sample[0].data.subtitle ],
-  [ data[1].alias, data[1].data.subtitle, sample[1].data.subtitle ],
-  [ data[2].alias, data[2].data.subtitle, sample[2].data.subtitle ],
-  [ data[3].alias, data[3].data.subtitle, sample[3].data.subtitle ],
-  [ data[4].alias, data[4].data.subtitle, sample[4].data.subtitle ]
-])('subtitle', (alias, fact, expected) => {
-  test(`${alias} subtitle is ${expected}`, () => {
-    expect(fact).toEqual(expected);
-  })
+  test(`${alias} subtitle is ${expected.subtitle}`, () => {
+    expect(fact.subtitle).toEqual(expected.subtitle);
+  });
 });
 
 describe.each([

@@ -1,4 +1,4 @@
-import { Comment, Commit, Entity, Sprint, Summary, User } from '../types/types';
+import { Comment, Commit, Entity, Sprint, Summary, User } from './types/types';
 
 function memoize(func: Function) {
   const cache = new Map();
@@ -70,8 +70,12 @@ export function filterData(
   },
   id: number
 ) {
-  //вообще по среднему времени лучше было бы find, но type checker боится получить undefined
-  const currSprint = data.sprints.filter(sprint => sprint.id === id)[0];
+
+  const currSprint = data.sprints.find(sprint => sprint.id === id);
+
+  if (!currSprint) {
+    return { comments: [], commits: [], sprint: null }
+  }
 
   const filteredComments = data.comments.filter(comment => {
     return comment.createdAt > currSprint.startAt && comment.createdAt <= currSprint.finishAt;
@@ -95,11 +99,11 @@ export function setWordEnding(num: number, variants: Array<string>) {
 function baseGetAuthorId(unit: Comment | Commit) {
   if (typeof unit.author === 'number') {
     return unit.author;
-  } if (unit.author.id) {
+  } else if (unit.author.id) {
     return unit.author.id;
   }
 }
-const getAuthorId = memoize(baseGetAuthorId);
+export const getAuthorId = memoize(baseGetAuthorId);
 
 function baseFilterByUser(data: Commit[] | Comment[], id: number) {
   // @ts-ignore

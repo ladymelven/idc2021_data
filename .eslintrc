@@ -33,7 +33,6 @@
     "no-new": "off",
     "import/first": "off",
     "consistent-return": "off",
-    "no-useless-escape": "off",
     "linebreak-style": "off",
     "arrow-parens": "off",
     "arrow-body-style": "warn",
