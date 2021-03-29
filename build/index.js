@@ -128,7 +128,7 @@ function rankUsers(users, commits, comments, identifier, stopper) {
     }
     else if (zeroCommitsIndex >= 0) {
         console.log(zeroCommitsIndex);
-        slice = ranked.slice(zeroCommitsIndex);
+        slice = ranked.slice(0, zeroCommitsIndex);
     }
     else {
         slice = ranked;

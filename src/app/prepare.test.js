@@ -3,15 +3,14 @@ const rawData = require('../data/input.json');
 const sample = require('../data/sample.json');
 
 console.time('prepare');
-const data = prepareData(rawData, { sprintId: 977 });
-// const data = prepareData(rawData, { sprintId: 991 });
+// const data = prepareData(rawData, { sprintId: 977 });
+const data = prepareData(rawData, { sprintId: 991 });
 console.timeEnd('prepare');
 console.time('empty');
 const emptySprintData = prepareData(rawData, { sprintId: 996 });
 console.timeEnd('empty');
 
-// console.log(data[3].data);
-// console.log(data[0].data.users);
+console.log(data[0].data.users);
 
 test('passes smoke test', () => {
   expect(data).toBeTruthy();
